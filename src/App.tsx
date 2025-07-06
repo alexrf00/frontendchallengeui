@@ -2,8 +2,8 @@ import { Graph } from './features/graph/Graph';
 
 function App() {
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Onboard Customer Workflow</h1>
+    <div>
+      <h1>Jorney Builder React Coding Challenge</h1>
       <Graph />
     </div>
   );
