@@ -25,10 +25,8 @@ A React-based form workflow management system that allows users to create comple
 - **Modal Interface**: Easy selection of prefill sources and fields
 - **Real-time Updates**: Immediate visual feedback on form states
 
-## Architecture
-- **scream architecture** 
-
 ## Project Structure
+
 ```
 src/
 ├── components/
@@ -121,26 +119,209 @@ Individual graph nodes that:
    - Can create complex field mappings
    - Submit when complete
 
-## Installation
+## Data Structure
+
+### Form Mapping
+```javascript
+{
+  field_name: {
+    node_id: "form-uuid-123",     // Source form node ID
+    field_key: "source_field"     // Source field name
+  }
+}
+```
+
+### Submitted Values
+```javascript
+{
+  "form-uuid-123": {
+    "field1": "value1",
+    "field2": "value2"
+  }
+}
+```
+
+## Testing
+
+The project includes comprehensive test coverage using **Vitest** and **React Testing Library**.
+
+### Test Suite Overview
 
 ```bash
-npm install @xyflow/react
+npm run test
 ```
 
-## Dependencies
+### Test Coverage
 
-- **React**: UI framework
-- **@xyflow/react**: Graph visualization and interaction
-- **TypeScript**: Type safety
+- **50 total tests** across 3 test files
+- **Components**: FormNode, Graph, PrefillMappingModal, FormPrefillPanel
+- **Utilities**: getUpstreamFormIds graph traversal logic
+- **Integration**: Full component interaction workflows
 
-## Configuration
+### Test Files
 
-The system fetches graph data from:
+#### `FormNode.test.tsx`
+- **4 tests** covering form node rendering
+- Name display with various data states
+- Fallback behavior for missing/empty names
+- Handle positioning and click prevention
+
+#### `getUpstreamFormIds.test.ts` 
+- **11 tests** covering graph traversal logic
+- Simple upstream relationships
+- Complex multi-path dependencies
+- Edge cases: circular dependencies, empty graphs, deep chains
+- Performance testing with 100+ node chains
+
+#### `Graph.test.tsx`
+- **35 comprehensive tests** covering the main component
+- **Initial Rendering**: API data fetching, error handling
+- **Node Interaction**: Selection, click handling, state updates
+- **Form Schema Resolution**: Schema mapping, missing data handling
+- **Upstream Calculation**: Dependency chain calculation
+- **Mapping Updates**: Field mapping CRUD operations
+- **Component Integration**: Panel and modal interactions
+- **State Management**: Initialization, updates, persistence
+- **Error Handling**: Malformed data, API failures, edge cases
+- **Performance**: Large dataset handling, memory cleanup
+
+### Testing Strategy
+
+#### **Unit Tests**
+- Individual component behavior
+- Utility function logic
+- Error boundary testing
+
+#### **Integration Tests**
+- Component interaction workflows
+- State management across components
+- Event handling and data flow
+
+#### **Mocking Strategy**
+```typescript
+// ReactFlow components mocked for testing
+vi.mock('@xyflow/react', () => ({
+  ReactFlow: ({ children, onNodeClick, nodes }: any) => (
+    <div data-testid="react-flow">
+      {nodes.map((node: any) => (
+        <div key={node.id} data-testid={`node-${node.id}`}>
+          {node.data.name}
+        </div>
+      ))}
+    </div>
+  ),
+  ReactFlowProvider: ({ children }: any) => <div>{children}</div>
+}))
+
+// API hooks mocked for controlled testing
+vi.mock('../hooks/useGraphData')
 ```
-http://localhost:3000/api/v1/1/actions/blueprints/bp_01jk766tckfwx84xjcxazggzyc/graph
+
+### Test Scenarios
+
+#### **Form Workflow Testing**
+1. **Node Selection** → Panel appearance → Mapping configuration
+2. **Field Mapping** → Modal opening → Source selection → Confirmation
+3. **Form Submission** → Value storage → Downstream availability
+4. **Error Handling** → Graceful degradation → User feedback
+
+#### **Data Flow Testing**
+- Upstream form calculation with complex dependencies
+- Prefill value resolution from multiple sources
+- Global data integration
+- Value priority handling (user input > prefill > default)
+
+#### **Edge Case Coverage**
+- Malformed API responses
+- Missing form schemas
+- Circular dependencies
+- Large datasets (1000+ nodes)
+- Empty states and null values
+
+### Running Tests
+
+```bash
+# Run all tests
+npm run test
+
 ```
 
-Modify the API endpoint in `useGraphData.ts` to match your backend.
+### Test Configuration
+
+#### **Setup** (`setupTests.ts`)
+```typescript
+import '@testing-library/jest-dom'
+
+// Mock ResizeObserver for ReactFlow compatibility
+globalThis.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+```
+
+#### **Dependencies**
+- **Vitest**: Fast unit test framework
+- **React Testing Library**: Component testing utilities
+- **@testing-library/jest-dom**: Custom Jest matchers
+- **@testing-library/user-event**: User interaction simulation
+
+### Mock Data
+
+#### **Test Data Structure**
+```typescript
+// Sample test nodes (mockData.ts)
+export interface BlueprintNode extends XFNode {
+  data: {
+    component_key: string
+    name: string
+    prerequisites: string[]
+    input_mapping: Record<string, any>
+  }
+}
+
+// Complete form workflow graph for testing
+const mockGraphData = {
+  nodes: [/* Form A, B, C, D, E, F */],
+  edges: [/* Dependency relationships */],
+  forms: [/* Form schemas with field definitions */]
+}
+```
+
+### Performance Testing
+
+#### **Large Dataset Handling**
+- Tests with 1000+ nodes verify scalability
+- Memory cleanup verification on component unmount
+- Efficient graph traversal algorithms
+
+#### **Stress Testing Scenarios**
+- Deep dependency chains (100+ levels)
+- Complex branching workflows
+- Multiple form instance handling
+- Rapid state updates
+
+### Continuous Integration
+
+Tests run automatically on:
+- Code commits
+- Pull requests
+- Deployment pipeline
+
+### Test Quality Metrics
+
+- **High Coverage**: All critical paths tested
+- **Fast Execution**: Sub-second test runs
+- **Reliable**: Consistent results across environments
+- **Maintainable**: Clear test structure and naming
+
+### Future Testing Enhancements
+
+- [ ] E2E testing with Playwright
+- [ ] Visual regression testing
+- [ ] Accessibility testing automation
+- [ ] Performance benchmarking
+- [ ] Cross-browser compatibility testing
 
 ## Future Enhancements
 
@@ -149,4 +330,4 @@ Modify the API endpoint in `useGraphData.ts` to match your backend.
 - [ ] Conditional prefill logic
 - [ ] Export/import mapping configurations
 - [ ] Audit trail for form submissions
-- [ ] Real-time collaboration features# frontendchallengeui
+- [ ] Real-time collaboration features
