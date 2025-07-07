@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "vitest",
-    "coveratest": "vitest run --coverage"
+    "test": "vitest"
   },
   "dependencies": {
     "@xyflow/react": "^12.8.1",
