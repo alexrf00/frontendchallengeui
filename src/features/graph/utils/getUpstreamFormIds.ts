@@ -1,4 +1,5 @@
-import type { Edge } from '../graph.types';
+import type { Edge } from "@xyflow/react";
+
 
 export function getUpstreamFormIds(formId: string, edges: Edge[]): string[] {
   const visited = new Set<string>();
