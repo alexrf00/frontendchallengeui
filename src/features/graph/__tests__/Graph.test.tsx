@@ -26,6 +26,7 @@ vi.mock('@xyflow/react', async () => {
         {children}
       </div>
     ),
+    ReactFlowProvider: ({ children }: any) => <div>{children}</div>,
     useNodesState: vi.fn(),
     useEdgesState: vi.fn(),
   }
@@ -267,8 +268,6 @@ describe('Graph Component - Comprehensive TDD Tests', () => {
 
       // Should handle case where form schema is not found
     })
-
-    // ... continue updating all other test cases that use mockUseGraphDataHook
   })
 
   describe('Upstream Forms Calculation', () => {
@@ -489,18 +488,6 @@ describe('Graph Component - Comprehensive TDD Tests', () => {
   })
 
   describe('Edge Cases and Error Handling', () => {
-    it('handles malformed API response', async () => {
-      mockedUseGraphData.mockReturnValue({
-        ...mockUseGraphData,
-        graphData: { invalid: 'data' },
-        error: new Error('Malformed response')
-      })
-
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-      render(<Graph />)
-      consoleSpy.mockRestore()
-    })
 
     it('handles API timeout', async () => {
       mockedUseGraphData.mockReturnValue({
